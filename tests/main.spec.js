@@ -1,53 +1,91 @@
-import {expect} from 'chai';
-import {sum,sub,mult,div} from '../src/main';
+import chai, {expect} from 'chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+import sinonStubPromise from 'sinon-stub-promise';
+chai.use(sinonChai);
+sinonStubPromise(sinon);
 
-describe('Calc', () =>{
+global.fetch = require('node-fetch');
+
+import {search, searchAlbums, searchArtists, searchTracks, searchPlaylist} from '../src/main';
+
+describe('Spotify Wrapper', () =>{
     
     //smoke tests
     describe('Smoke tests', () =>{
-                
-        it('should exist the method `sum`', () =>{
-            expect(sum).to.exist;
-            expect(sum).to.be.a.function;
+        
+        //search (generico) - + de um tipo
+        //searchAlbums
+        //searchArtists
+        //searchTracks
+        //searchPlaylists
+        
+        it('should exist the search method', () =>{
+            expect(search).to.exist;
         });
         
-        it('should exist the method `sub`', () =>{
-            expect(sub).to.exist;
-            expect(sub).to.be.a.function;
+        it('should exist the seachAlbums method', () =>{
+            expect(searchAlbums).to.exist;
         });
         
-        it('should exist the method `mult`', () =>{
-            expect(mult).to.exist;
-            expect(mult).to.be.a.function;
+        it('should exist the searchArtists method', () =>{
+            expect(searchArtists).to.exist;
         });
         
-        it('should exist the method `div`', () =>{
-            expect(div).to.exist;
-            expect(div).to.be.a.function;
+        it('should exist the searchTracks method', () =>{
+            expect(searchTracks).to.exist;
+        });
+        
+        it('should exist the searchPlaylist method', () =>{
+            expect(searchPlaylist).to.exist;
         });
     });
     
-    describe('Sum', function(){
-        it('should return 4 when `sum(2,2)`', () =>{
-            expect(sum(2,2)).to.be.equal(4);
+    describe('Genetic Search', () =>{
+        
+        let fetchedStub;
+        let promisse; 
+        
+        beforeEach( () => {
+            fetchedStub = sinon.stub(global, 'fetch');
+            promisse = fetchedStub.returnsPromise();
         });
-    });
-
-    describe('Sub', function(){
-        it('should return 4 when `sub(6,2)`', () =>{
-            expect(sub(6,2)).to.be.equal(4);
+        
+        afterEach( () =>{
+            fetchedStub.restore();
         });
-    });
-
-    describe('Mult', function(){
-        it('should return 4 when `multi(2,2)`', () =>{
-            expect(mult(2,2)).to.be.equal(4);
+        
+        it('should call fetch function', () =>{
+            
+            const artists = search();
+            //espero
+            expect(fetchedStub).to.have.been.calledOnce;
         });
-    });
+        
+        if('should receive the correct url to fecth', () =>{
+            
+            context('passing one type', () =>{               
+                const artists = search('Incubus', 'artist');
+                expect(fetchedStub).to.have.been
+                .calledWith('https://api.spotify.com/v1/search?q=Incubus&type=artist');
+                
+                const albums = search('Incubus', 'album');
+                expect(fetchedStub).to.have.been
+                .calledWith('https://api.spotify.com/v1/search?q=Incubus&type=album');
+            });
+            
+            context('passing more than one type', () =>{                
+                const artistsAndAlbuns = search('Incubus', ['artist','album']);
+                expect(fetchedStub).to.have.been
+                .calledWith('https://api.spotify.com/v1/search?q=Incubus&type=artist,album');
+            });
+        });
+        
+        it('should return the Json data from the promisse', () =>{
+            promisse.resolves({body: 'json'});
+            const artists = search('Incubus', 'artist');
 
-    describe('Div', function(){
-        it('should return 4 when `div(4,2)`', () =>{
-            expect(div(4,2)).to.be.equal(2);
+            expect(artists.resolveValue).to.been.eql({body: 'json'});
         });
     });
 });

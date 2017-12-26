@@ -1,7 +1,9 @@
+export const search = (query, type) =>
+fetch(`https://api.spotify.com/v1/search?q=${query}&type=${type}`)
+.then(data => data.json)
 
-    const sum = (num1,num2) => num1,num2;
-    const sub = (num1,num2) => num1,num2;
-    const mult = (num1,num2) => num1,num2;
-    const div = (num1,num2) => num1,num2;
 
-    export {sum,sub,mult,div}
+export const searchArtists = () =>{}
+export const searchAlbums = () =>{}
+export const searchTracks = () =>{}
+export const searchPlaylist = () =>{}
