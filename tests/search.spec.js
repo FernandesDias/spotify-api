@@ -9,7 +9,7 @@ global.fetch = require('node-fetch');
 
 import {search, searchAlbums, searchArtists, searchTracks, searchPlaylist} from '../src/main';
 
-describe('Spotify Wrapper', () =>{
+describe('Search', () =>{
     
     let fetchedStub;
     let promisse; 
